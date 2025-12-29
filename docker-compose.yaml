@@ -1,16 +1,10 @@
-services:
-  database:
-    image: postgres:15-alpine
-    container_name: crewbase
-    restart: always
+services:  
+  api:
+    build:
+      context: .
+    container_name: apishka
     environment:
-      POSTGRES_USER: opgadmin
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: crew
+      PORT: 6060
     ports:
-      - "5433:5432"
-    volumes:
-      - db:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-volumes:
-  db:
+      - '6060:6060'
+    restart: "always"
