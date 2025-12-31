@@ -6,16 +6,26 @@ services:
       POSTGRES_DB: crew
       POSTGRES_USER: opgadmin
       POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U opgadmin -d crew"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+  
   api:
-    container_name: apii
     build: .
-    depends_on:
-      - db
+    container_name: apii
     ports:
       - "6060:6060"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://opgadmin:secret@db:5432/crew
 
 volumes:
-  pgdata:
+  postgres_data:

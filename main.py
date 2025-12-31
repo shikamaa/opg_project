@@ -61,7 +61,7 @@ def delete_roster(bandit_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "bandit deleted"}
 
-@app.post('/banks/', response_model=BankResponse, status_code=201)
+@app.post('/bank/', response_model=BankResponse, status_code=201)
 def create_bank(bank: BankBase, db: Session = Depends(get_db)):
     db_bank = Bank(**bank.dict())
     db.add(db_bank)
@@ -69,19 +69,19 @@ def create_bank(bank: BankBase, db: Session = Depends(get_db)):
     db.refresh(db_bank)
     return db_bank
 
-@app.get('/banks/', response_model=List[BankResponse])
+@app.get('/bank/', response_model=List[BankResponse])
 def read_banks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     banks = db.query(Bank).offset(skip).limit(limit).all()
     return banks
 
-@app.get('/banks/{bank_id}', response_model=BankResponse)
+@app.get('/bank/{bank_id}', response_model=BankResponse)
 def read_bank_by_id(bank_id: int, db: Session = Depends(get_db)):
     bank = db.query(Bank).filter(Bank.bank_id == bank_id).first()
     if not bank:
         raise HTTPException(status_code=404, detail="Bank not found")
     return bank
 
-@app.put('/banks/{bank_id}', response_model=BankResponse)
+@app.put('/bank/{bank_id}', response_model=BankResponse)
 def update_bank(bank_id: int, bank: BankBase, db: Session = Depends(get_db)):
     db_bank = db.query(Bank).filter(Bank.bank_id == bank_id).first()
     if not db_bank:
@@ -94,7 +94,7 @@ def update_bank(bank_id: int, bank: BankBase, db: Session = Depends(get_db)):
     db.refresh(db_bank)
     return db_bank
 
-@app.delete('/banks/{bank_id}')
+@app.delete('/bank/{bank_id}')
 def delete_bank(bank_id: int, db: Session = Depends(get_db)):
     db_bank = db.query(Bank).filter(Bank.bank_id == bank_id).first()
     if not db_bank:
@@ -104,7 +104,7 @@ def delete_bank(bank_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "bank deleted"}
 
-@app.post('/robberies/', response_model=RobberyResponse, status_code=201)
+@app.post('/robbery/', response_model=RobberyResponse, status_code=201)
 def create_robbery(robbery: RobberyBase, db: Session = Depends(get_db)):
     bandit = db.query(Roster).filter(Roster.bandit_id == robbery.bandit_id).first()
     if not bandit:
@@ -120,19 +120,19 @@ def create_robbery(robbery: RobberyBase, db: Session = Depends(get_db)):
     db.refresh(db_robbery)
     return db_robbery
 
-@app.get('/robberies/', response_model=List[RobberyResponse])
+@app.get('/robbery/', response_model=List[RobberyResponse])
 def read_robberies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     robberies = db.query(Robbery).offset(skip).limit(limit).all()
     return robberies
 
-@app.get('/robberies/{robbery_id}', response_model=RobberyResponse)
+@app.get('/robbery/{robbery_id}', response_model=RobberyResponse)
 def read_robbery_by_id(robbery_id: int, db: Session = Depends(get_db)):
     robbery = db.query(Robbery).filter(Robbery.robbery_id == robbery_id).first()
     if not robbery:
         raise HTTPException(status_code=404, detail="robbery not found")
     return robbery
 
-@app.put('/robberies/{robbery_id}', response_model=RobberyResponse)
+@app.put('/robbery/{robbery_id}', response_model=RobberyResponse)
 def update_robbery(robbery_id: int, robbery: RobberyBase, db: Session = Depends(get_db)):
     db_robbery = db.query(Robbery).filter(Robbery.robbery_id == robbery_id).first()
     if not db_robbery:
@@ -145,7 +145,7 @@ def update_robbery(robbery_id: int, robbery: RobberyBase, db: Session = Depends(
     db.refresh(db_robbery)
     return db_robbery
 
-@app.delete('/robberies/{robbery_id}')
+@app.delete('/robbery/{robbery_id}')
 def delete_robbery(robbery_id: int, db: Session = Depends(get_db)):
     db_robbery = db.query(Robbery).filter(Robbery.robbery_id == robbery_id).first()
     if not db_robbery:
