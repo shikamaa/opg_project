@@ -1,10 +1,21 @@
-services:  
-  api:
-    build:
-      context: .
-    container_name: apishka
+services:
+  db:
+    image: postgres:16
+    container_name: pgr
     environment:
-      PORT: 6060
+      POSTGRES_DB: crew
+      POSTGRES_USER: opgadmin
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    container_name: apii
+    build: .
+    depends_on:
+      - db
     ports:
-      - '6060:6060'
-    restart: "always"
+      - "6060:6060"
+
+volumes:
+  pgdata:

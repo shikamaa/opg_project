@@ -13,4 +13,4 @@ EXPOSE 6060
 
 #COPY main.py .
 COPY . .
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "6060", "--reload"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "6060"]

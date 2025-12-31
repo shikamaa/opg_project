@@ -4,4 +4,4 @@ alembic
 uvicorn
 pydantic
 psycopg2
-
+faker

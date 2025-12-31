@@ -1,57 +1,22 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
-from opg_db import get_db, engine, Base, Roster, Bank, Robbery
 
-
-Base.metadata.create_all(bind=engine)
+from schemas import *
+from opg_db import engine, Base, get_db
+from models import Roster, Bank, Robbery
 
 app = FastAPI()
 
-class RosterBase(BaseModel):
-    nickname: str
-    bandit_status: bool
-    specialization: Optional[str] = None
-    bandit_level: Optional[int] = None
-    contacts: Optional[str] = None
-    appearance_date: Optional[date] = None
+@app.on_event("startup")
+def startup():
+    Base.metadata.create_all(bind=engine)
 
-class RosterResponse(RosterBase):
-    bandit_id: int
-    class Config:
-        from_attributes = True
-
-class BankBase(BaseModel):
-    name: str
-    address: Optional[str] = None
-    security_level: Optional[int] = None
-    daily_income: Optional[int] = None
-    attractiveness: Optional[int] = None
-
-class BankResponse(BankBase):
-    bank_id: int
-    class Config:
-        from_attributes = True
-
-class RobberyBase(BaseModel):
-    bandit_id: int
-    bank_id: int
-    robbery_date: date
-    bandit_outcome: bool
-    share: Optional[int] = None
-    action_score: Optional[int] = None
-
-class RobberyResponse(RobberyBase):
-    robbery_id: int
-    class Config:
-        from_attributes = True
-
-
-@app.get('/')
-async def root():
-    return {"msg": "hi"}
+@app.get("/")
+def root():
+    return {"msg": "ok"}
 
 @app.post('/roster/', response_model=RosterResponse, status_code=201)
 def create_roster(roster: RosterBase, db: Session = Depends(get_db)):
