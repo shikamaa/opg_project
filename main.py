@@ -154,3 +154,57 @@ def delete_robbery(robbery_id: int, db: Session = Depends(get_db)):
     db.delete(db_robbery)
     db.commit()
     return {"message": "robbery deleted"}
+
+
+from sqlalchemy import func
+
+@app.get('/roster/filter/', response_model=List[RosterResponse])
+def filter_roster(specialization: str, min_level: int = 1, db: Session = Depends(get_db)):
+    results = db.query(Roster).filter(
+        Roster.specialization == specialization,
+        Roster.bandit_level >= min_level
+    ).all()
+    return results
+
+
+@app.get('/robbery/details/', response_model=List[dict])
+def robbery_details(db: Session = Depends(get_db)):
+    results = db.query(
+        Robbery.robbery_id,
+        Roster.nickname.label('bandit_name'),
+        Bank.name.label('bank_name'),
+        Robbery.robbery_date,
+        Robbery.share
+    ).join(Roster, Robbery.bandit_id == Roster.bandit_id)\
+     .join(Bank, Robbery.bank_id == Bank.bank_id)\
+     .all()
+    
+    return [dict(r._asdict()) for r in results]
+
+@app.put('/roster/increase_score/')
+def increase_score(db: Session = Depends(get_db)):
+    updated = db.query(Roster)\
+        .filter(Roster.bandit_level > 7, Roster.specialization == 'hacker')\
+        .update({Roster.score: Roster.score + 10}, synchronize_session=False)
+    
+    db.commit()
+    return {"updated": updated}
+
+@app.get('/robbery/summary/', response_model=List[dict])
+def robbery_summary(db: Session = Depends(get_db)):
+    results = db.query(
+        Robbery.bandit_id,
+        func.sum(Robbery.share).label('total_share')
+    ).group_by(Robbery.bandit_id).all()
+    
+    return [dict(r._asdict()) for r in results]
+
+@app.get('/roster/sorted/', response_model=List[RosterResponse])
+def sorted_roster(order: str = 'desc', db: Session = Depends(get_db)):
+    query = db.query(Roster)
+    if order == 'asc':
+        query = query.order_by(Roster.score.asc())
+    else:
+        query = query.order_by(Roster.score.desc())
+    
+    return query.all()

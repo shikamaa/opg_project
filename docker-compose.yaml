@@ -1,7 +1,6 @@
 services:
   db:
     image: postgres:16
-    container_name: pgr
     environment:
       POSTGRES_DB: crew
       POSTGRES_USER: opgadmin
@@ -18,7 +17,6 @@ services:
   
   api:
     build: .
-    container_name: apii
     ports:
       - "6060:6060"
     depends_on:
